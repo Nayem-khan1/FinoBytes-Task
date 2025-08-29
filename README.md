@@ -35,11 +35,11 @@ This project is a React + Redux application built as an interview assessment. It
 
 1.  Clone the repository:
     ```bash
-    git clone https://github.com/your-username/role-based-dashboard.git
+    git clone https://github.com/Nayem-khan1/FinoBytes-Task.git
     ```
 2.  Navigate to the project directory:
     ```bash
-    cd role-based-dashboard
+    cd FinoBytes-Task
     ```
 3.  Install the dependencies:
     ```bash
@@ -81,7 +81,7 @@ The application will be available at `http://localhost:5173`.
 
 ## Deployment
 
-This project is deployed on Vercel. You can view the live demo here:
+This project is deployed on Vercel. You can view the live demo here: https://fino-bytes-task.vercel.app/
 
 ## License
 
