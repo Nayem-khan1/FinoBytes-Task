@@ -1,145 +1,88 @@
-# Role-Based Dashboard – Fix & Complete Instructions
+# Role-Based Dashboard
 
-## Goal
+This project is a React + Redux application built as an interview assessment. It demonstrates a role-based login and dashboard system with protected routes and state management using Redux Toolkit.
 
-Fix all errors and complete the Role-Based Dashboard project in **React + Vite + TypeScript** with **Redux Toolkit**.  
-Ensure the app fully satisfies the interview requirements:
+## Features
 
-- Redux properly used (auth + dummy data)
-- Role-based login works (Admin, Merchant, Member)
-- Protected routes implemented
-- All dashboards have dummy features
-- Logout works
-- data load from JSON
+- **Role-Based Access Control**: Three distinct user roles (Admin, Merchant, Member) with dedicated login pages and dashboards.
+- **Authentication**: Secure login system using fake tokens stored in `localStorage`.
+- **Protected Routes**: Client-side route protection to ensure only authenticated users can access their respective dashboards.
+- **Redux State Management**: Centralized state management for authentication, user roles, and dummy data using Redux Toolkit.
+- **Admin Dashboard**:
+  - View and manage a table of users and merchants.
+  - Approve or delete users and merchants.
+- **Merchant Dashboard**:
+  - Approve purchase requests.
+  - Look up customer information.
+  - Set a contribution rate.
+  - View notifications.
+- **Member Dashboard**:
+  - View a summary of points.
+- **Logout**: Clear the authentication token from `localStorage` and reset the Redux state.
 
----
+## Tech Stack
 
-## Steps Gemini Should Do
+- **React**: A JavaScript library for building user interfaces.
+- **Vite**: A fast build tool and development server for modern web projects.
+- **TypeScript**: A typed superset of JavaScript that compiles to plain JavaScript.
+- **Redux Toolkit**: The official, opinionated, batteries-included toolset for efficient Redux development.
+- **React Router**: The standard library for routing in React.
+- **Tailwind CSS**: A utility-first CSS framework for rapid UI development.
+- **shadcn/ui**: A collection of re-usable components built using Radix UI and Tailwind CSS.
+- **Zod**: A TypeScript-first schema declaration and validation library.
 
-### 1. Project Setup
+## Installation
 
-- **React + Vite + TypeScript**.
-- Install and configure:
-  - `@reduxjs/toolkit`
-  - `react-redux`
-  - `react-router`
-  - `shadcn` 
+1.  Clone the repository:
+    ```bash
+    git clone https://github.com/your-username/role-based-dashboard.git
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd role-based-dashboard
+    ```
+3.  Install the dependencies:
+    ```bash
+    npm install
+    ```
 
----
+## Usage
 
-### 2. Redux Setup
+To start the development server, run the following command:
 
-Create Redux slices inside `src/redux/`:
+```bash
+npm run dev
+```
 
-#### `authSlice.ts`
+The application will be available at `http://localhost:5173`.
 
-- State: `{ token: string | null, role: 'admin' | 'merchant' | 'member' | null }`
-- Actions:
-  - `loginSuccess(payload: { token: string, role: string })`
-  - `logout()`
+## Project Structure
 
-#### `dataSlice.ts`
+```
+.
+├── public
+└── src
+    ├── assets
+    ├── components
+    │   ├── layout
+    │   └── ui
+    ├── features
+    │   ├── auth
+    │   └── data
+    ├── hooks
+    ├── lib
+    ├── pages
+    │   ├── auth
+    │   └── dashboard
+    ├── routes
+    ├── store
+    └── utils
+```
 
-- Store dummy data from JSON files in `src/utils/`:
-  - `users.json`
-  - `merchants.json`
-  - `notifications.json`
-  - `points.json`
-- Provide reducers to update/approve items.
+## Deployment
 
----
+This project is deployed on Vercel. You can view the live demo here:
 
-### 3. Authentication Pages
+## License
 
-Create 3 login pages:
-
-- `/login/admin` → Email + Password
-- `/login/merchant` → Store details + Password
-- `/login/member` → Phone/Email + Password (or OTP simulation)
-
-✅ On successful login:
-
-- Save token in `localStorage` (e.g., `"admin-token"`)
-- Dispatch Redux `loginSuccess`
-- Redirect to respective dashboard.
-
----
-
-### 4. Protected Routing
-
-Create `src/routes/ProtectedRoute.tsx`:
-
-- Check Redux `auth.token` and `auth.role`.
-- If not valid → redirect to correct login page.
-- Otherwise → render children.
-
-Update `App.tsx`:
-
-- Routes:
-  - `/dashboard/admin`
-  - `/dashboard/merchant`
-  - `/dashboard/member`
-
----
-
-### 5. Dashboards
-
-#### Admin Dashboard
-
-- Show dummy **Users/Merchants table**.
-- Buttons: Approve / Delete (update Redux state).
-
-#### Merchant Dashboard
-
-- Approve Purchases → Table + Approve button
-- Lookup Customer → Search bar (filter dummy JSON)
-- Set Contribution Rate → Form (number input)
-- Notifications → Dummy requests list
-
-#### Member Dashboard
-
-- Show **Points Summary** from JSON (progress bar/cards)
-
----
-
-### 6. Logout
-
-- Add Logout button in Navbar.
-- On click:
-  - Clear Redux state
-  - Remove token from `localStorage`
-  - Redirect to `/login/{role}`
-
----
-
-### 7. Extra Features
-
-- Add **form validation** (basic required fields).
-- Add **loader/spinner** when data is fetching/approving.
-- Keep UI clean with Tailwind and shad cn.
-
----
-
-### 8. Deployment Readiness
-
-- Ensure `npm run dev` runs without errors.
-- Add a clear `README.md` with setup instructions.
-- Prepare for deployment (Vercel).
-
----
-
-## Final Checklist
-
-- [ ] No TypeScript errors
-- [ ] Redux Toolkit configured properly
-- [ ] Role-based login fully working
-- [ ] Protected routes secure
-- [ ] All dashboards implemented with dummy features
-- [ ] Logout working
-- [ ] JSON data used for dashboards
-
-## Rules for Gemini
-
-- ❌ Do **NOT** run the dev server automatically.
-- ✅ Only scan, fix, and ensure code is production-ready.
-- ✅ After fixes, show me the list of changes you made.
+This project is licensed under the MIT License.
