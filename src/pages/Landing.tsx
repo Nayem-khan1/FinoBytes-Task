@@ -11,7 +11,7 @@ const Landing = () => {
             <div className="container mx-auto px-4 py-16">
                 <div className="text-center mb-16">
                     <h1 className="text-4xl md:text-6xl font-bold text-foreground mb-6 text-balance">
-                        Welcome to Your Dashboard
+                        Welcome to Your <span className="text-blue-600">Dashboard </span>
                     </h1>
                     <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto text-pretty">
                         Access your personalized dashboard based on your role. Choose your login type to get started.
@@ -33,7 +33,7 @@ const Landing = () => {
                         </CardHeader>
                         <CardContent className="pt-0">
                             <Link to="/login/admin" className="block">
-                                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground">
+                                <Button className="w-full bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer">
                                     Login as Admin
                                 </Button>
                             </Link>
@@ -43,8 +43,8 @@ const Landing = () => {
                     {/* Merchant Card */}
                     <Card className="hover:shadow-lg transition-shadow duration-300 border-border">
                         <CardHeader className="text-center pb-4">
-                            <div className="mx-auto mb-4 p-3 bg-accent/10 rounded-full w-fit">
-                                <Store className="h-8 w-8 text-accent" />
+                            <div className="mx-auto mb-4 p-3 bg-emerald-50 rounded-full w-fit">
+                                <Store className="h-8 w-8 text-emerald-600" />
                             </div>
                             <CardTitle className="text-xl font-semibold">Merchant Portal</CardTitle>
                             <CardDescription className="text-muted-foreground">
@@ -53,7 +53,7 @@ const Landing = () => {
                         </CardHeader>
                         <CardContent className="pt-0">
                             <Link to="/login/merchant" className="block">
-                                <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground">
+                                <Button className="w-full bg-emerald-600 hover:bg-emerald-700 text-white cursor-pointer">
                                     Login as Merchant
                                 </Button>
                             </Link>
@@ -73,7 +73,7 @@ const Landing = () => {
                         </CardHeader>
                         <CardContent className="pt-0">
                             <Link to="/login/member" className="block">
-                                <Button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground">
+                                <Button className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground cursor-pointer">
                                     Login as Member
                                 </Button>
                             </Link>
@@ -99,7 +99,7 @@ const Landing = () => {
 
                         <Card className="text-center">
                             <CardHeader>
-                                <Store className="h-12 w-12 text-accent mx-auto mb-4" />
+                                <Store className="h-12 w-12 text-emerald-600 mx-auto mb-4" />
                                 <CardTitle className="text-lg">Merchant Tools</CardTitle>
                             </CardHeader>
                             <CardContent>
