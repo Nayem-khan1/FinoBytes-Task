@@ -120,7 +120,7 @@ const MerchantLogin: React.FC = () => {
                             </div>
                             <Button
                                 type="submit"
-                                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground"
+                                className="w-full bg-accent hover:bg-accent/90 text-accent-foreground cursor-pointer"
                                 disabled={isLoading}
                             >
                                 {isLoading ? "Logging in..." : "Login"}

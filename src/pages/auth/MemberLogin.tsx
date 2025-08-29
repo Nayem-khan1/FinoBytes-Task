@@ -89,8 +89,8 @@ const MemberLogin: React.FC = () => {
                     <CardContent>
                         <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
                             <TabsList className="grid w-full grid-cols-2">
-                                <TabsTrigger value="password">Password</TabsTrigger>
-                                <TabsTrigger value="otp">OTP</TabsTrigger>
+                                <TabsTrigger className='cursor-pointer' value="password">Password</TabsTrigger>
+                                <TabsTrigger className='cursor-pointer' value="otp">OTP</TabsTrigger>
                             </TabsList>
 
                             <TabsContent value="password" className="space-y-4 mt-4">
@@ -127,7 +127,7 @@ const MemberLogin: React.FC = () => {
                                     </div>
                                     <Button
                                         type="submit"
-                                        className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                                        className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground cursor-pointer"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "Logging in..." : "Login"}
@@ -159,7 +159,7 @@ const MemberLogin: React.FC = () => {
                                 {!showOtpInput ? (
                                     <Button
                                         onClick={handleSendOtp}
-                                        className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                                        className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground cursor-pointer"
                                         disabled={isLoading}
                                     >
                                         {isLoading ? "Sending OTP..." : "Send OTP"}
@@ -183,7 +183,7 @@ const MemberLogin: React.FC = () => {
                                         </div>
                                         <Button
                                             type="submit"
-                                            className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground"
+                                            className="w-full bg-secondary hover:bg-secondary/90 text-secondary-foreground cursor-pointer"
                                             disabled={isLoading}
                                         >
                                             {isLoading ? "Verifying..." : "Verify OTP"}

@@ -121,7 +121,7 @@ const AdminLogin: React.FC = () => {
 
                             <Button
                                 type="submit"
-                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground"
+                                className="w-full bg-primary hover:bg-primary/90 text-primary-foreground cursor-pointer"
                                 disabled={isLoading}
                             >
                                 {isLoading ? 'Logging in...' : 'Login'}
