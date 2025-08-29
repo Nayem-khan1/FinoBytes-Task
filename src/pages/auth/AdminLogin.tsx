@@ -131,7 +131,7 @@ const AdminLogin: React.FC = () => {
                         <div className="mt-4 text-center">
                             <p className="text-sm text-muted-foreground">
                                 Don't have an account?{' '}
-                                <Link to="/register/admin" className="text-primary hover:underline">
+                                <Link to="#" className="text-primary hover:underline">
                                     Create Admin Account
                                 </Link>
                             </p>
