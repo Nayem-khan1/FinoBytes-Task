@@ -10,7 +10,7 @@ export function BreadcrumbNav() {
 
     const pathSegments = pathname.split("/").filter(Boolean)
 
-    const breadcrumbs: { label: string, href: string, icon?: any }[] = [{ label: "Home", href: "/", icon: Home }]
+    const breadcrumbs: { label: string, href: string, icon?: React.ElementType }[] = [{ label: "Home", href: "/", icon: Home }]
 
     // Build breadcrumb trail
     let currentPath = ""

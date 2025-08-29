@@ -81,31 +81,6 @@ const Landing = () => {
                     </Card>
                 </div>
 
-                {/* Registration Section */}
-                <div className="mt-16 text-center">
-                    <h2 className="text-2xl font-semibold text-foreground mb-4">New to the platform?</h2>
-                    <div className="flex flex-wrap justify-center gap-4">
-                        <Link to="/register/admin">
-                            <Button variant="outline" className="text-primary border-primary hover:bg-primary/10 bg-transparent">
-                                Register as Admin
-                            </Button>
-                        </Link>
-                        <Link to="/register/merchant">
-                            <Button variant="outline" className="text-accent border-accent hover:bg-accent/10 bg-transparent">
-                                Register as Merchant
-                            </Button>
-                        </Link>
-                        <Link to="/register/member">
-                            <Button
-                                variant="outline"
-                                className="text-secondary border-secondary hover:bg-secondary/10 bg-transparent"
-                            >
-                                Register as Member
-                            </Button>
-                        </Link>
-                    </div>
-                </div>
-
                 {/* Feature Highlights */}
                 <div className="mt-20">
                     <h2 className="text-3xl font-bold text-center text-foreground mb-12">Platform Capabilities</h2>
