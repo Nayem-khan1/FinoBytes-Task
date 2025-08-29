@@ -7,6 +7,7 @@ import { BrowserRouter as Router, Routes, Route } from "react-router";
 import ProtectedRoute from "./ProtectedRoute";
 import MerchantDashboard from "@/pages/dashboard/merchant/MerchantDashboard";
 import MemberDashboard from "@/pages/dashboard/member/MemberDashboard";
+import NotFound from "@/pages/NotFound";
 
 const AppRoutes = () => {
     return (
@@ -40,6 +41,7 @@ const AppRoutes = () => {
                         </ProtectedRoute>
                     }
                 />
+                <Route path="*" element={<NotFound />} />
             </Routes>
         </Router>
     );

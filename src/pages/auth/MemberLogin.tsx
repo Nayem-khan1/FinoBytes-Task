@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { Link, useNavigate } from 'react-router';
-import { login } from '../../features/auth/authSlice';
+import { Link, useNavigate } from 'react-router-dom';
+import { loginSuccess } from '../../features/auth/authSlice';
 import { z } from 'zod';
 import {
     Card,
@@ -21,25 +21,53 @@ const memberLoginSchema = z.object({
     password: z.string().min(6),
 });
 
-const MemberLogin = () => {
+const MemberLogin: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ emailOrPhone: '', password: '' });
-    const [errors, setErrors] = useState({});
+    const [errors, setErrors] = useState<{ emailOrPhone?: string, password?: string }>({});
+    const [isLoading, setIsLoading] = useState(false);
+    const [activeTab, setActiveTab] = useState("password");
+    const [error, setError] = useState("");
+    const [phoneEmail, setPhoneEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [showOtpInput, setShowOtpInput] = useState(false);
+    const [otpCode, setOtpCode] = useState("");
 
-    const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
-    };
-
-    const handleSubmit = (e) => {
+    const handlePasswordSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        const result = memberLoginSchema.safeParse(formData);
+        setIsLoading(true);
+
+        const result = memberLoginSchema.safeParse({ emailOrPhone: phoneEmail, password });
         if (result.success) {
-            dispatch(login({ role: 'member', token: 'member-token' }));
+            dispatch(loginSuccess({ role: 'member', token: 'member-token' }));
             navigate('/dashboard/member');
         } else {
-            setErrors(result.error.formErrors.fieldErrors);
+            const fieldErrors = result.error.flatten().fieldErrors;
+            setErrors({
+                emailOrPhone: fieldErrors.emailOrPhone?.[0],
+                password: fieldErrors.password?.[0],
+            });
         }
+
+        setIsLoading(false);
+    };
+
+    const handleSendOtp = async () => {
+        setIsLoading(true);
+        setError("");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        setShowOtpInput(true);
+        setIsLoading(false);
+    };
+
+    const handleOtpSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
+        setError("");
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+        dispatch(loginSuccess({ role: 'member', token: 'member-token' }));
+        navigate('/dashboard/member');
+        setIsLoading(false);
     };
 
     return (
@@ -67,11 +95,8 @@ const MemberLogin = () => {
 
                             <TabsContent value="password" className="space-y-4 mt-4">
                                 <form onSubmit={handlePasswordSubmit} className="space-y-4">
-                                    {error && (
-                                        <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                                            {error}
-                                        </div>
-                                    )}
+                                    {errors.emailOrPhone && <p className="text-red-500">{errors.emailOrPhone}</p>}
+                                    {errors.password && <p className="text-red-500">{errors.password}</p>}
                                     <div className="space-y-2">
                                         <Label htmlFor="phoneEmail" className="text-sm font-medium text-foreground">
                                             Phone or Email

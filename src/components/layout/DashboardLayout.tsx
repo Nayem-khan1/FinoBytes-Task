@@ -1,5 +1,5 @@
 import type React from "react"
-import { useState, useEffect } from "react"
+import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -29,13 +29,10 @@ import {
     History,
     ShieldCheck,
 } from "lucide-react"
-
-interface NavigationItem {
-    name: string
-    href: string
-    icon: React.ComponentType<{ className?: string }>
-    current?: boolean
-}
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { logout } from "@/features/auth/authSlice"
+import { Link, useLocation, useNavigate } from "react-router-dom"
 
 interface DashboardLayoutProps {
     children: React.ReactNode
@@ -72,23 +69,16 @@ const roleLabels = {
 }
 
 export function DashboardLayout({ children }: DashboardLayoutProps) {
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const location = useLocation();
+    const { role } = useSelector((state: RootState) => state.auth);
+
     const [sidebarOpen, setSidebarOpen] = useState(false)
-    const [user, setUser] = useState<any>(null)
     const [searchQuery, setSearchQuery] = useState("")
-    const [notificationCount, setNotificationCount] = useState(3) // Mock notification count
-    const router = useRouter()
-    const pathname = usePathname()
+    const [notificationCount] = useState(3) // Mock notification count
 
-    useEffect(() => {
-        const currentUser = authHelpers.getUser()
-        if (!currentUser) {
-            router.push("/")
-            return
-        }
-        setUser(currentUser)
-    }, [router])
-
-    if (!user) {
+    if (!role) {
         return (
             <div className="flex h-screen items-center justify-center">
                 <div className="text-center">
@@ -99,31 +89,31 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
         )
     }
 
-    const navigation = navigationConfig[user.role as UserRole].map((item) => ({
+    const navigation = navigationConfig[role].map((item) => ({
         ...item,
-        current: pathname === item.href,
+        current: location.pathname === item.href,
     }))
 
     const handleLogout = () => {
-        authHelpers.logout()
-        router.push("/")
+        dispatch(logout());
+        navigate(`/login/${role}`);
     }
 
     const getBreadcrumbs = () => {
-        const pathSegments = pathname.split("/").filter(Boolean)
+        const pathSegments = location.pathname.split("/").filter(Boolean)
         const breadcrumbs = []
 
         if (pathSegments.length > 2) {
             breadcrumbs.push({
-                name: roleLabels[user.role as UserRole],
-                href: `/dashboard/${user.role}`,
+                name: roleLabels[role],
+                href: `/dashboard/${role}`,
             })
 
-            const currentNav = navigation.find((nav) => nav.href === pathname)
+            const currentNav = navigation.find((nav) => nav.href === location.pathname)
             if (currentNav) {
                 breadcrumbs.push({
                     name: currentNav.name,
-                    href: pathname,
+                    href: location.pathname,
                 })
             }
         }
@@ -137,7 +127,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="flex h-16 shrink-0 items-center px-6 border-b border-sidebar-border">
                 <div className="flex items-center gap-2">
                     <ShieldCheck className="h-6 w-6 text-sidebar-primary" />
-                    <h1 className="text-lg font-semibold text-sidebar-foreground">{roleLabels[user.role as UserRole]}</h1>
+                    <h1 className="text-lg font-semibold text-sidebar-foreground">{roleLabels[role]}</h1>
                 </div>
             </div>
 
@@ -147,7 +137,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                     {navigation.map((item) => (
                         <li key={item.name}>
                             <Link
-                                href={item.href}
+                                to={item.href}
                                 className={`group flex gap-x-3 rounded-md p-3 text-sm font-medium transition-colors ${item.current
                                     ? "bg-sidebar-primary text-sidebar-primary-foreground"
                                     : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
@@ -166,20 +156,15 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
             <div className="border-t border-sidebar-border p-4">
                 <div className="flex items-center gap-x-3">
                     <Avatar className="h-8 w-8">
-                        <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                        <AvatarImage src={"/placeholder.svg"} />
                         <AvatarFallback className="bg-sidebar-accent text-sidebar-accent-foreground">
-                            {user.name
-                                .split(" ")
-                                .map((n: string) => n[0])
-                                .join("")
-                                .toUpperCase()}
+                            {role.charAt(0).toUpperCase()}
                         </AvatarFallback>
                     </Avatar>
                     <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-sidebar-foreground truncate">{user.name}</p>
-                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                        <p className="text-sm font-medium text-sidebar-foreground truncate">{role}</p>
                         <Badge variant="secondary" className="text-xs mt-1">
-                            {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
+                            {role.charAt(0).toUpperCase() + role.slice(1)}
                         </Badge>
                     </div>
                 </div>
@@ -226,7 +211,7 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                                             <li key={crumb.href} className="flex items-center">
                                                 {index > 0 && <span className="text-muted-foreground mx-2">/</span>}
                                                 <Link
-                                                    href={crumb.href}
+                                                    to={crumb.href}
                                                     className="text-sm font-medium text-muted-foreground hover:text-foreground"
                                                 >
                                                     {crumb.name}
@@ -267,13 +252,9 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <DropdownMenuTrigger asChild>
                                     <Button variant="ghost" className="relative h-8 w-8 rounded-full">
                                         <Avatar className="h-8 w-8">
-                                            <AvatarImage src={user.avatar || "/placeholder.svg"} />
+                                            <AvatarImage src={"/placeholder.svg"} />
                                             <AvatarFallback>
-                                                {user.name
-                                                    .split(" ")
-                                                    .map((n: string) => n[0])
-                                                    .join("")
-                                                    .toUpperCase()}
+                                                {role.charAt(0).toUpperCase()}
                                             </AvatarFallback>
                                         </Avatar>
                                     </Button>
@@ -281,13 +262,12 @@ export function DashboardLayout({ children }: DashboardLayoutProps) {
                                 <DropdownMenuContent className="w-56" align="end" forceMount>
                                     <DropdownMenuLabel className="font-normal">
                                         <div className="flex flex-col space-y-1">
-                                            <p className="text-sm font-medium leading-none">{user.name}</p>
-                                            <p className="text-xs leading-none text-muted-foreground">{user.email}</p>
+                                            <p className="text-sm font-medium leading-none">{role}</p>
                                         </div>
                                     </DropdownMenuLabel>
                                     <DropdownMenuSeparator />
                                     <DropdownMenuItem asChild>
-                                        <Link href={`/dashboard/${user.role}/settings`}>
+                                        <Link to={`/dashboard/${role}/settings`}>
                                             <Settings className="mr-2 h-4 w-4" />
                                             <span>Settings</span>
                                         </Link>

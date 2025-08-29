@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { login } from '../../features/auth/authSlice';
+import { loginSuccess } from '../../features/auth/authSlice';
 import { useAppDispatch } from '../../store/hooks';
 import { z } from 'zod';
 import {
@@ -13,7 +13,7 @@ import { ArrowLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 
 const adminLoginSchema = z.object({
     email: z.string().email(),
@@ -43,10 +43,10 @@ const AdminLogin: React.FC = () => {
 
         const result = adminLoginSchema.safeParse(formData);
         if (result.success) {
-            dispatch(login({ role: 'admin', token: 'admin-token' }));
+            dispatch(loginSuccess({ role: 'admin', token: 'admin-token' }));
             navigate('/dashboard/admin');
         } else {
-            const fieldErrors = result.error.formErrors.fieldErrors;
+            const fieldErrors = result.error.flatten().fieldErrors;
             setErrors({
                 email: fieldErrors.email?.[0],
                 password: fieldErrors.password?.[0],

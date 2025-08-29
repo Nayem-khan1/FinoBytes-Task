@@ -18,97 +18,21 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search, UserCheck, UserX, Eye, TrendingUp, TrendingDown, Users, Store, Mail } from "lucide-react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-
-const dummyUsers = [
-    {
-        id: "1",
-        name: "John Smith",
-        email: "john@example.com",
-        role: "member" as const,
-        status: "active" as const,
-        createdAt: "2024-01-15",
-        storeId: null,
-        storeName: null,
-    },
-    {
-        id: "2",
-        name: "Sarah Johnson",
-        email: "sarah@example.com",
-        role: "member" as const,
-        status: "suspended" as const,
-        createdAt: "2024-02-20",
-        storeId: null,
-        storeName: null,
-    },
-    {
-        id: "3",
-        name: "Mike Chen",
-        email: "mike@electronics.com",
-        role: "merchant" as const,
-        status: "active" as const,
-        createdAt: "2024-01-10",
-        storeId: "ELEC001",
-        storeName: "Mike's Electronics",
-    },
-    {
-        id: "4",
-        name: "Emma Wilson",
-        email: "emma@example.com",
-        role: "member" as const,
-        status: "active" as const,
-        createdAt: "2024-03-05",
-        storeId: null,
-        storeName: null,
-    },
-    {
-        id: "5",
-        name: "Alex Rodriguez",
-        email: "alex@techstore.com",
-        role: "merchant" as const,
-        status: "pending" as const,
-        createdAt: "2024-03-15",
-        storeId: "TECH002",
-        storeName: "Tech Store Plus",
-    },
-    {
-        id: "6",
-        name: "David Brown",
-        email: "david@example.com",
-        role: "member" as const,
-        status: "active" as const,
-        createdAt: "2024-02-28",
-        storeId: null,
-        storeName: null,
-    },
-    {
-        id: "7",
-        name: "Lisa Park",
-        email: "lisa@fashionhub.com",
-        role: "merchant" as const,
-        status: "active" as const,
-        createdAt: "2024-01-25",
-        storeId: "FASH003",
-        storeName: "Fashion Hub",
-    },
-    {
-        id: "8",
-        name: "Robert Garcia",
-        email: "robert@example.com",
-        role: "admin" as const,
-        status: "active" as const,
-        createdAt: "2024-01-01",
-        storeId: null,
-        storeName: null,
-    },
-]
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { deleteUser, deleteMerchant } from "@/features/data/dataSlice"
 
 const AdminDashboard = () => {
-    const [users, setUsers] = useState(dummyUsers)
+    const dispatch = useDispatch();
+    const { users, merchants } = useSelector((state: RootState) => state.data);
+
+    const allUsers = [...users, ...merchants];
+
     const [searchTerm, setSearchTerm] = useState("")
     const [roleFilter, setRoleFilter] = useState("all")
     const [statusFilter, setStatusFilter] = useState("all")
     const [isLoading, setIsLoading] = useState(false)
-    const [selectedUser, setSelectedUser] = useState<(typeof dummyUsers)[0] | null>(null)
+    const [selectedUser, setSelectedUser] = useState<(typeof allUsers)[0] | null>(null)
     const [showCreateMerchant, setShowCreateMerchant] = useState(false)
     const [showInviteAdmin, setShowInviteAdmin] = useState(false)
     const [newMerchant, setNewMerchant] = useState({
@@ -119,23 +43,21 @@ const AdminDashboard = () => {
     })
     const [inviteEmail, setInviteEmail] = useState("")
 
-    const filteredUsers = users.filter((user) => {
+    const filteredUsers = allUsers.filter((user) => {
         const matchesSearch =
             user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-            (user.storeName && user.storeName.toLowerCase().includes(searchTerm.toLowerCase())) ||
-            (user.storeId && user.storeId.toLowerCase().includes(searchTerm.toLowerCase()))
-        const matchesRole = roleFilter === "all" || user.role === roleFilter
-        const matchesStatus = statusFilter === "all" || user.status === statusFilter
+            user.email.toLowerCase().includes(searchTerm.toLowerCase())
+        const matchesRole = roleFilter === "all" || user.role.toLowerCase() === roleFilter
+        // const matchesStatus = statusFilter === "all" || user.status === statusFilter
 
-        return matchesSearch && matchesRole && matchesStatus
+        return matchesSearch && matchesRole //&& matchesStatus
     })
 
     const stats = {
-        totalUsers: users.length,
-        totalMerchants: users.filter((u) => u.role === "merchant").length,
-        activeUsers: users.filter((u) => u.status === "active").length,
-        pendingUsers: users.filter((u) => u.status === "pending").length,
+        totalUsers: allUsers.length,
+        totalMerchants: merchants.length,
+        activeUsers: allUsers.length, //allUsers.filter((u) => u.status === "active").length,
+        pendingUsers: 0, //allUsers.filter((u) => u.status === "pending").length,
         // Mock trend data
         userGrowth: 12.5,
         merchantGrowth: 8.3,
@@ -143,32 +65,13 @@ const AdminDashboard = () => {
         pendingGrowth: -15.7,
     }
 
-    const handleStatusChange = async (userId: string, newStatus: "active" | "suspended") => {
-        setIsLoading(true)
-        // Simulate API call
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-
-        setUsers(users.map((user) => (user.id === userId ? { ...user, status: newStatus } : user)))
-        setIsLoading(false)
-    }
-
     const handleCreateMerchant = async () => {
         setIsLoading(true)
         // Simulate API call
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
-        const newUser = {
-            id: (users.length + 1).toString(),
-            name: newMerchant.storeName,
-            email: newMerchant.ownerEmail,
-            role: "merchant" as const,
-            status: "pending" as const,
-            createdAt: new Date().toISOString().split("T")[0],
-            storeId: newMerchant.storeId,
-            storeName: newMerchant.storeName,
-        }
-
-        setUsers([newUser, ...users])
+        // In a real app, you would dispatch an action to create a new merchant
+        console.log("New merchant created:", newMerchant)
         setNewMerchant({ storeName: "", storeId: "", ownerEmail: "", password: "" })
         setShowCreateMerchant(false)
         setIsLoading(false)
@@ -200,7 +103,7 @@ const AdminDashboard = () => {
     }
 
     const getRoleBadgeVariant = (role: string) => {
-        switch (role) {
+        switch (role.toLowerCase()) {
             case "admin":
                 return "destructive"
             case "merchant":
@@ -389,42 +292,39 @@ const AdminDashboard = () => {
                                                     </Badge>
                                                 </TableCell>
                                                 <TableCell className="text-muted-foreground">
-                                                    {user.role === "merchant" ? (
+                                                    {user.role.toLowerCase() === "merchant" ? (
                                                         <div>
                                                             <div>{user.email}</div>
-                                                            <div className="text-xs text-muted-foreground">{user.storeId}</div>
                                                         </div>
                                                     ) : (
                                                         user.email
                                                     )}
                                                 </TableCell>
                                                 <TableCell>
-                                                    <Badge variant={getStatusBadgeVariant(user.status)}>
-                                                        {user.status.charAt(0).toUpperCase() + user.status.slice(1)}
+                                                    <Badge variant={getStatusBadgeVariant("active")}>
+                                                        Active
                                                     </Badge>
                                                 </TableCell>
-                                                <TableCell className="text-muted-foreground">{user.createdAt}</TableCell>
+                                                <TableCell className="text-muted-foreground">{"2024-01-01"}</TableCell>
                                                 <TableCell className="text-right">
                                                     <div className="flex items-center justify-end gap-2">
                                                         <Button variant="ghost" size="sm" onClick={() => setSelectedUser(user)}>
                                                             <Eye className="h-4 w-4" />
                                                         </Button>
-                                                        {user.status !== "pending" && (
-                                                            <Button
-                                                                variant="ghost"
-                                                                size="sm"
-                                                                onClick={() =>
-                                                                    handleStatusChange(user.id, user.status === "active" ? "suspended" : "active")
+                                                        <Button
+                                                            variant="ghost"
+                                                            size="sm"
+                                                            onClick={() => {
+                                                                if (user.role.toLowerCase() === 'member') {
+                                                                    dispatch(deleteUser(user.id))
+                                                                } else {
+                                                                    dispatch(deleteMerchant(user.id))
                                                                 }
-                                                                disabled={isLoading}
-                                                            >
-                                                                {user.status === "active" ? (
-                                                                    <UserX className="h-4 w-4" />
-                                                                ) : (
-                                                                    <UserCheck className="h-4 w-4" />
-                                                                )}
-                                                            </Button>
-                                                        )}
+                                                            }}
+                                                            disabled={isLoading}
+                                                        >
+                                                            <UserX className="h-4 w-4" />
+                                                        </Button>
                                                     </div>
                                                 </TableCell>
                                             </TableRow>
@@ -569,25 +469,13 @@ const AdminDashboard = () => {
                                     </div>
                                     <div>
                                         <Label className="text-sm font-medium">Status</Label>
-                                        <Badge variant={getStatusBadgeVariant(selectedUser.status)} className="mt-1">
-                                            {selectedUser.status.charAt(0).toUpperCase() + selectedUser.status.slice(1)}
+                                        <Badge variant={getStatusBadgeVariant("active")} className="mt-1">
+                                            Active
                                         </Badge>
                                     </div>
-                                    {selectedUser.role === "merchant" && (
-                                        <>
-                                            <div>
-                                                <Label className="text-sm font-medium">Store Name</Label>
-                                                <p className="text-sm text-muted-foreground">{selectedUser.storeName}</p>
-                                            </div>
-                                            <div>
-                                                <Label className="text-sm font-medium">Store ID</Label>
-                                                <p className="text-sm text-muted-foreground">{selectedUser.storeId}</p>
-                                            </div>
-                                        </>
-                                    )}
                                     <div>
                                         <Label className="text-sm font-medium">Created At</Label>
-                                        <p className="text-sm text-muted-foreground">{selectedUser.createdAt}</p>
+                                        <p className="text-sm text-muted-foreground">{"2024-01-01"}</p>
                                     </div>
                                 </div>
                             </div>

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useDispatch } from 'react-redux';
-import { login } from '../../features/auth/authSlice';
+import { loginSuccess } from '../../features/auth/authSlice';
 import { z } from 'zod';
 import {
     Card,
@@ -13,57 +13,44 @@ import { ArrowLeft } from 'lucide-react';
 import { Label } from '@/components/ui/label';
 import { Input } from '@/components/ui/input';
 import { Button } from '@/components/ui/button';
-import { Link, useNavigate } from 'react-router';
+import { Link, useNavigate } from 'react-router-dom';
 
 const merchantLoginSchema = z.object({
-    storeDetails: z.string().min(3),
+    storeName: z.string().min(3),
+    storeId: z.string().min(3),
     password: z.string().min(6),
 });
 
-const MerchantLogin = () => {
+const MerchantLogin: React.FC = () => {
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [formData, setFormData] = useState({ storeDetails: '', password: '' });
-    const [errors, setErrors] = useState({});
+    const [formData, setFormData] = useState({ storeName: '', storeId: '', password: '' });
+    const [errors, setErrors] = useState<Partial<typeof formData>>({});
+    const [isLoading, setIsLoading] = useState(false);
 
-    const handleChange = (e) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
-    // const handleSubmit = (e) => {
-    //     e.preventDefault();
-    //     const result = merchantLoginSchema.safeParse(formData);
-    //     if (result.success) {
-    //         dispatch(login({ role: 'merchant', token: 'merchant-token' }));
-    //         navigate('/dashboard/merchant');
-    //     } else {
-    //         setErrors(result.error.formErrors.fieldErrors);
-    //     }
-    // };  
+    const handleSubmit = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsLoading(true);
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault()
-        setIsLoading(true)
-        setError("")
-
-        try {
-            // Simulate login process
-            await new Promise((resolve) => setTimeout(resolve, 1000))
-
-            authHelpers.login("merchant", {
-                name: storeName,
-                email: `${storeId}@merchant.com`,
-                storeName,
-                storeId,
-            })
-
-            router.push("/dashboard/merchant")
-        } catch (err) {
-            setError("Invalid credentials. Please try again.")
-        } finally {
-            setIsLoading(false)
+        const result = merchantLoginSchema.safeParse(formData);
+        if (result.success) {
+            dispatch(loginSuccess({ role: 'merchant', token: 'merchant-token' }));
+            navigate('/dashboard/merchant');
+        } else {
+            const fieldErrors = result.error.flatten().fieldErrors;
+            setErrors({
+                storeName: fieldErrors.storeName?.[0],
+                storeId: fieldErrors.storeId?.[0],
+                password: fieldErrors.password?.[0],
+            });
         }
-    }
+
+        setIsLoading(false);
+    };
 
     return (
         <div className="min-h-screen flex items-center justify-center bg-background px-4">
@@ -83,21 +70,20 @@ const MerchantLogin = () => {
                     </CardHeader>
                     <CardContent>
                         <form onSubmit={handleSubmit} className="space-y-4">
-                            {error && (
-                                <div className="p-3 text-sm text-destructive-foreground bg-destructive/10 border border-destructive/20 rounded-md">
-                                    {error}
-                                </div>
-                            )}
+                            {errors.storeName && <p className="text-red-500">{errors.storeName}</p>}
+                            {errors.storeId && <p className="text-red-500">{errors.storeId}</p>}
+                            {errors.password && <p className="text-red-500">{errors.password}</p>}
                             <div className="space-y-2">
                                 <Label htmlFor="storeName" className="text-sm font-medium text-foreground">
                                     Store Name
                                 </Label>
                                 <Input
                                     id="storeName"
+                                    name="storeName"
                                     type="text"
                                     placeholder="Your Store Name"
-                                    value={storeName}
-                                    onChange={(e) => setStoreName(e.target.value)}
+                                    value={formData.storeName}
+                                    onChange={handleChange}
                                     required
                                     className="w-full bg-input border-border"
                                 />
@@ -108,10 +94,11 @@ const MerchantLogin = () => {
                                 </Label>
                                 <Input
                                     id="storeId"
+                                    name="storeId"
                                     type="text"
                                     placeholder="STORE123"
-                                    value={storeId}
-                                    onChange={(e) => setStoreId(e.target.value)}
+                                    value={formData.storeId}
+                                    onChange={handleChange}
                                     required
                                     className="w-full bg-input border-border"
                                 />
@@ -122,10 +109,11 @@ const MerchantLogin = () => {
                                 </Label>
                                 <Input
                                     id="password"
+                                    name="password"
                                     type="password"
                                     placeholder="Enter your password"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
+                                    value={formData.password}
+                                    onChange={handleChange}
                                     required
                                     className="w-full bg-input border-border"
                                 />
@@ -142,7 +130,7 @@ const MerchantLogin = () => {
                         <div className="mt-4 text-center">
                             <p className="text-sm text-muted-foreground">
                                 Don't have an account?{" "}
-                                <Link href="/register/merchant" className="text-accent hover:underline">
+                                <Link to="/register/merchant" className="text-accent hover:underline">
                                     Register Merchant
                                 </Link>
                             </p>

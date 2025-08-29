@@ -1,20 +1,20 @@
 
 import { ChevronRight, Home } from "lucide-react"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router-dom"
 
 export function BreadcrumbNav() {
-    const pathname = usePathname()
+    const { pathname } = useLocation();
 
     // Don't show breadcrumbs on home page
     if (pathname === "/") return null
 
     const pathSegments = pathname.split("/").filter(Boolean)
 
-    const breadcrumbs = [{ label: "Home", href: "/", icon: Home }]
+    const breadcrumbs: { label: string, href: string, icon?: any }[] = [{ label: "Home", href: "/", icon: Home }]
 
     // Build breadcrumb trail
     let currentPath = ""
-    pathSegments.forEach((segment, index) => {
+    pathSegments.forEach((segment) => {
         currentPath += `/${segment}`
 
         let label = segment.charAt(0).toUpperCase() + segment.slice(1)

@@ -1,0 +1,4 @@
+[
+  { "id": 1, "name": "Super Store", "email": "super@example.com", "role": "Merchant" },
+  { "id": 2, "name": "Mega Mart", "email": "mega@example.com", "role": "Merchant" }
+]

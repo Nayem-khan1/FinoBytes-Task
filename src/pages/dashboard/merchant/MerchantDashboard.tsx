@@ -13,156 +13,27 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle, SheetTr
 import { Skeleton } from "@/components/ui/skeleton"
 import { Search, Check, X, Eye, Bell, TrendingUp, TrendingDown, ShoppingCart, Users, Percent } from "lucide-react"
 import { DashboardLayout } from "@/components/layout/DashboardLayout"
-
-const dummyPurchases = [
-    {
-        id: "REQ001",
-        customer: "John Smith",
-        amount: 129.99,
-        points: 130,
-        date: "2024-03-20",
-        status: "pending" as const,
-        memberId: "MEM001",
-    },
-    {
-        id: "REQ002",
-        customer: "Sarah Johnson",
-        amount: 24.99,
-        points: 25,
-        date: "2024-03-20",
-        status: "pending" as const,
-        memberId: "MEM002",
-    },
-    {
-        id: "REQ003",
-        customer: "Mike Wilson",
-        amount: 79.99,
-        points: 80,
-        date: "2024-03-19",
-        status: "approved" as const,
-        memberId: "MEM003",
-    },
-    {
-        id: "REQ004",
-        customer: "Emma Davis",
-        amount: 12.99,
-        points: 13,
-        date: "2024-03-19",
-        status: "pending" as const,
-        memberId: "MEM004",
-    },
-    {
-        id: "REQ005",
-        customer: "David Brown",
-        amount: 45.99,
-        points: 46,
-        date: "2024-03-18",
-        status: "rejected" as const,
-        memberId: "MEM005",
-    },
-]
-
-const dummyCustomers = [
-    {
-        id: "CUST001",
-        name: "John Smith",
-        memberId: "MEM001",
-        pointsBalance: 1250,
-        lastPurchaseDate: "2024-03-20",
-        email: "john@example.com",
-        phone: "+1 (555) 123-4567",
-        totalPurchases: 15,
-        totalSpent: 1299.85,
-        joinDate: "2024-01-15",
-        tier: "Gold",
-    },
-    {
-        id: "CUST002",
-        name: "Sarah Johnson",
-        memberId: "MEM002",
-        pointsBalance: 850,
-        lastPurchaseDate: "2024-03-19",
-        email: "sarah@example.com",
-        phone: "+1 (555) 234-5678",
-        totalPurchases: 8,
-        totalSpent: 649.92,
-        joinDate: "2024-02-01",
-        tier: "Silver",
-    },
-    {
-        id: "CUST003",
-        name: "Mike Wilson",
-        memberId: "MEM003",
-        pointsBalance: 2100,
-        lastPurchaseDate: "2024-03-18",
-        email: "mike@example.com",
-        phone: "+1 (555) 345-6789",
-        totalPurchases: 22,
-        totalSpent: 2199.78,
-        joinDate: "2024-01-10",
-        tier: "Platinum",
-    },
-]
-
-const dummyNotifications = [
-    {
-        id: "NOT001",
-        title: "New Purchase Request",
-        type: "Approval Request" as const,
-        message: "John Smith submitted a purchase request for $129.99",
-        createdAt: "5 minutes ago",
-        read: false,
-    },
-    {
-        id: "NOT002",
-        title: "Purchase Approved",
-        type: "Info" as const,
-        message: "Purchase request REQ003 has been approved",
-        createdAt: "1 hour ago",
-        read: false,
-    },
-    {
-        id: "NOT003",
-        title: "Monthly Report Ready",
-        type: "Info" as const,
-        message: "Your monthly sales report is now available",
-        createdAt: "2 hours ago",
-        read: true,
-    },
-    {
-        id: "NOT004",
-        title: "New Customer Registration",
-        type: "Info" as const,
-        message: "Emma Davis joined your loyalty program",
-        createdAt: "3 hours ago",
-        read: true,
-    },
-]
-
-const contributionHistory = [
-    { date: "2024-03-01", oldRate: 2.0, newRate: 2.5 },
-    { date: "2024-02-15", oldRate: 1.8, newRate: 2.0 },
-    { date: "2024-01-01", oldRate: 1.5, newRate: 1.8 },
-]
+import { useDispatch, useSelector } from "react-redux"
+import type { RootState } from "@/store/store"
+import { approvePurchase } from "@/features/data/dataSlice"
 
 const MerchantDashboard = () => {
-    const [purchases, setPurchases] = useState(dummyPurchases)
-    const [customers] = useState(dummyCustomers)
-    const [notifications, setNotifications] = useState(dummyNotifications)
-    const [selectedPurchases, setSelectedPurchases] = useState<string[]>([])
+    const dispatch = useDispatch();
+    const { purchases, users, notifications } = useSelector((state: RootState) => state.data);
+
+    const [selectedPurchases, setSelectedPurchases] = useState<number[]>([])
     const [customerSearch, setCustomerSearch] = useState("")
-    const [customerResults, setCustomerResults] = useState<typeof dummyCustomers>([])
-    const [selectedCustomer, setSelectedCustomer] = useState<(typeof dummyCustomers)[0] | null>(null)
+    const [customerResults, setCustomerResults] = useState<typeof users>([])
+    const [selectedCustomer, setSelectedCustomer] = useState<(typeof users)[0] | null>(null)
     const [contributionRate, setContributionRate] = useState(2.5)
     const [statusFilter, setStatusFilter] = useState("all")
-    const [dateFilter, setDateFilter] = useState("all")
     const [isLoading, setIsLoading] = useState(false)
 
     const stats = {
-        pendingApprovals: purchases.filter((p) => p.status === "pending").length,
-        approvedToday: purchases.filter((p) => p.status === "approved" && p.date === "2024-03-20").length,
+        pendingApprovals: purchases.filter((p) => p.status === "Pending").length,
+        approvedToday: purchases.filter((p) => p.status === "Approved").length,
         contributionRate: contributionRate,
-        unreadNotifications: notifications.filter((n) => !n.read).length,
+        unreadNotifications: notifications.length,
         // Mock trend data
         approvalsGrowth: 15.3,
         approvedGrowth: 8.7,
@@ -171,20 +42,17 @@ const MerchantDashboard = () => {
     }
 
     const filteredPurchases = purchases.filter((purchase) => {
-        const matchesStatus = statusFilter === "all" || purchase.status === statusFilter
-        const matchesDate = dateFilter === "all" || purchase.date === dateFilter
-        return matchesStatus && matchesDate
+        const matchesStatus = statusFilter === "all" || purchase.status.toLowerCase() === statusFilter
+        return matchesStatus
     })
 
-    const handlePurchaseAction = async (purchaseId: string, action: "approve" | "reject") => {
+    const handlePurchaseAction = async (purchaseId: number, action: "approve" | "reject") => {
         setIsLoading(true)
         await new Promise((resolve) => setTimeout(resolve, 1000))
 
-        setPurchases(
-            purchases.map((purchase) =>
-                purchase.id === purchaseId ? { ...purchase, status: action === "approve" ? "approved" : "rejected" } : purchase,
-            ),
-        )
+        if (action === "approve") {
+            dispatch(approvePurchase(purchaseId))
+        }
         setIsLoading(false)
     }
 
@@ -192,24 +60,19 @@ const MerchantDashboard = () => {
         setIsLoading(true)
         await new Promise((resolve) => setTimeout(resolve, 1500))
 
-        setPurchases(
-            purchases.map((purchase) =>
-                selectedPurchases.includes(purchase.id)
-                    ? { ...purchase, status: action === "approve" ? "approved" : "rejected" }
-                    : purchase,
-            ),
-        )
+        if (action === "approve") {
+            selectedPurchases.forEach((id) => dispatch(approvePurchase(id)))
+        }
         setSelectedPurchases([])
         setIsLoading(false)
     }
 
     const handleCustomerSearch = () => {
         if (customerSearch.trim()) {
-            const results = customers.filter(
+            const results = users.filter(
                 (customer) =>
                     customer.name.toLowerCase().includes(customerSearch.toLowerCase()) ||
-                    customer.email.toLowerCase().includes(customerSearch.toLowerCase()) ||
-                    customer.memberId.toLowerCase().includes(customerSearch.toLowerCase()),
+                    customer.email.toLowerCase().includes(customerSearch.toLowerCase())
             )
             setCustomerResults(results)
         } else {
@@ -223,20 +86,8 @@ const MerchantDashboard = () => {
         setIsLoading(false)
     }
 
-    const markNotificationAsRead = (notificationId: string) => {
-        setNotifications(
-            notifications.map((notification) =>
-                notification.id === notificationId ? { ...notification, read: true } : notification,
-            ),
-        )
-    }
-
-    const markAllNotificationsAsRead = () => {
-        setNotifications(notifications.map((notification) => ({ ...notification, read: true })))
-    }
-
     const getStatusBadgeVariant = (status: string) => {
-        switch (status) {
+        switch (status.toLowerCase()) {
             case "approved":
                 return "default"
             case "pending":
@@ -245,19 +96,6 @@ const MerchantDashboard = () => {
                 return "destructive"
             default:
                 return "secondary"
-        }
-    }
-
-    const getTierBadgeVariant = (tier: string) => {
-        switch (tier) {
-            case "Platinum":
-                return "default"
-            case "Gold":
-                return "secondary"
-            case "Silver":
-                return "outline"
-            default:
-                return "outline"
         }
     }
 
@@ -355,16 +193,6 @@ const MerchantDashboard = () => {
                                         <SelectItem value="rejected">Rejected</SelectItem>
                                     </SelectContent>
                                 </Select>
-                                <Select value={dateFilter} onValueChange={setDateFilter}>
-                                    <SelectTrigger className="w-full sm:w-40">
-                                        <SelectValue placeholder="Filter by date" />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                        <SelectItem value="all">All Dates</SelectItem>
-                                        <SelectItem value="2024-03-20">Today</SelectItem>
-                                        <SelectItem value="2024-03-19">Yesterday</SelectItem>
-                                    </SelectContent>
-                                </Select>
                                 {selectedPurchases.length > 0 && (
                                     <div className="flex gap-2">
                                         <Button
@@ -393,7 +221,7 @@ const MerchantDashboard = () => {
                                         <TableRow>
                                             <TableHead className="w-12">
                                                 <Checkbox
-                                                    checked={selectedPurchases.length === filteredPurchases.length}
+                                                    checked={selectedPurchases.length === filteredPurchases.length && filteredPurchases.length > 0}
                                                     onCheckedChange={(checked) => {
                                                         if (checked) {
                                                             setSelectedPurchases(filteredPurchases.map((p) => p.id))
@@ -406,8 +234,6 @@ const MerchantDashboard = () => {
                                             <TableHead>Request ID</TableHead>
                                             <TableHead>Customer</TableHead>
                                             <TableHead>Amount</TableHead>
-                                            <TableHead>Points</TableHead>
-                                            <TableHead>Date</TableHead>
                                             <TableHead>Status</TableHead>
                                             <TableHead className="text-right">Actions</TableHead>
                                         </TableRow>
@@ -430,12 +256,6 @@ const MerchantDashboard = () => {
                                                     </TableCell>
                                                     <TableCell>
                                                         <Skeleton className="h-4 w-12" />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Skeleton className="h-4 w-20" />
-                                                    </TableCell>
-                                                    <TableCell>
-                                                        <Skeleton className="h-4 w-16" />
                                                     </TableCell>
                                                     <TableCell>
                                                         <Skeleton className="h-4 w-20" />
@@ -470,15 +290,13 @@ const MerchantDashboard = () => {
                                                     <TableCell className="font-medium">{purchase.id}</TableCell>
                                                     <TableCell>{purchase.customer}</TableCell>
                                                     <TableCell>${purchase.amount}</TableCell>
-                                                    <TableCell>{purchase.points}</TableCell>
-                                                    <TableCell className="text-muted-foreground">{purchase.date}</TableCell>
                                                     <TableCell>
                                                         <Badge variant={getStatusBadgeVariant(purchase.status)}>
                                                             {purchase.status.charAt(0).toUpperCase() + purchase.status.slice(1)}
                                                         </Badge>
                                                     </TableCell>
                                                     <TableCell className="text-right">
-                                                        {purchase.status === "pending" ? (
+                                                        {purchase.status.toLowerCase() === "pending" ? (
                                                             <div className="flex items-center justify-end gap-2">
                                                                 <Button
                                                                     variant="outline"
@@ -543,12 +361,9 @@ const MerchantDashboard = () => {
                                         <div key={customer.id} className="border rounded-lg p-4 space-y-2">
                                             <div className="flex items-center justify-between">
                                                 <h4 className="font-medium">{customer.name}</h4>
-                                                <Badge variant={getTierBadgeVariant(customer.tier)}>{customer.tier}</Badge>
                                             </div>
                                             <div className="text-sm text-muted-foreground space-y-1">
-                                                <p>Member ID: {customer.memberId}</p>
-                                                <p>Points Balance: {customer.pointsBalance}</p>
-                                                <p>Last Purchase: {customer.lastPurchaseDate}</p>
+                                                <p>Email: {customer.email}</p>
                                             </div>
                                             <Sheet>
                                                 <SheetTrigger asChild>
@@ -576,54 +391,6 @@ const MerchantDashboard = () => {
                                                                 <div>
                                                                     <h3 className="text-lg font-semibold">{selectedCustomer.name}</h3>
                                                                     <p className="text-sm text-muted-foreground">{selectedCustomer.email}</p>
-                                                                    <Badge variant={getTierBadgeVariant(selectedCustomer.tier)} className="mt-1">
-                                                                        {selectedCustomer.tier} Member
-                                                                    </Badge>
-                                                                </div>
-                                                            </div>
-
-                                                            <div className="grid grid-cols-2 gap-4">
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Member ID</Label>
-                                                                    <p className="text-sm text-muted-foreground">{selectedCustomer.memberId}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Phone</Label>
-                                                                    <p className="text-sm text-muted-foreground">{selectedCustomer.phone}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Points Balance</Label>
-                                                                    <p className="text-sm font-semibold text-primary">{selectedCustomer.pointsBalance}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Total Purchases</Label>
-                                                                    <p className="text-sm text-muted-foreground">{selectedCustomer.totalPurchases}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Total Spent</Label>
-                                                                    <p className="text-sm text-muted-foreground">${selectedCustomer.totalSpent}</p>
-                                                                </div>
-                                                                <div>
-                                                                    <Label className="text-sm font-medium">Join Date</Label>
-                                                                    <p className="text-sm text-muted-foreground">{selectedCustomer.joinDate}</p>
-                                                                </div>
-                                                            </div>
-
-                                                            <div>
-                                                                <Label className="text-sm font-medium mb-2 block">Recent Purchases</Label>
-                                                                <div className="space-y-2">
-                                                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                                                                        <span className="text-sm">Wireless Headphones</span>
-                                                                        <span className="text-sm font-medium">$129.99</span>
-                                                                    </div>
-                                                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                                                                        <span className="text-sm">Bluetooth Speaker</span>
-                                                                        <span className="text-sm font-medium">$79.99</span>
-                                                                    </div>
-                                                                    <div className="flex justify-between items-center p-2 bg-muted rounded">
-                                                                        <span className="text-sm">Phone Case</span>
-                                                                        <span className="text-sm font-medium">$24.99</span>
-                                                                    </div>
                                                                 </div>
                                                             </div>
                                                         </div>
@@ -661,20 +428,6 @@ const MerchantDashboard = () => {
                             <Button onClick={handleSaveContributionRate} disabled={isLoading} className="w-full">
                                 {isLoading ? "Saving..." : "Save Rate"}
                             </Button>
-
-                            <div className="mt-4">
-                                <Label className="text-sm font-medium mb-2 block">Change History</Label>
-                                <div className="space-y-2">
-                                    {contributionHistory.map((change, index) => (
-                                        <div key={index} className="flex justify-between items-center text-sm p-2 bg-muted rounded">
-                                            <span className="text-muted-foreground">{change.date}</span>
-                                            <span>
-                                                {change.oldRate}% → {change.newRate}%
-                                            </span>
-                                        </div>
-                                    ))}
-                                </div>
-                            </div>
                         </CardContent>
                     </Card>
                 </div>
@@ -687,11 +440,6 @@ const MerchantDashboard = () => {
                                 <CardTitle>Notifications</CardTitle>
                                 <CardDescription>Recent activity and approval requests</CardDescription>
                             </div>
-                            {notifications.filter((n) => !n.read).length > 0 && (
-                                <Button variant="outline" size="sm" onClick={markAllNotificationsAsRead}>
-                                    Mark all as read
-                                </Button>
-                            )}
                         </div>
                     </CardHeader>
                     <CardContent>
@@ -706,26 +454,18 @@ const MerchantDashboard = () => {
                                 notifications.map((notification) => (
                                     <div
                                         key={notification.id}
-                                        className={`border rounded-lg p-4 cursor-pointer transition-colors ${!notification.read ? "bg-accent/10 border-accent" : "hover:bg-muted/50"
-                                            }`}
-                                        onClick={() => markNotificationAsRead(notification.id)}
+                                        className={`border rounded-lg p-4 cursor-pointer transition-colors`}
                                     >
                                         <div className="flex items-start justify-between">
                                             <div className="flex-1">
                                                 <div className="flex items-center gap-2 mb-1">
                                                     <p
-                                                        className={`text-sm font-medium ${!notification.read ? "text-foreground" : "text-muted-foreground"}`}
+                                                        className={`text-sm font-medium`}
                                                     >
-                                                        {notification.title}
+                                                        {notification.message}
                                                     </p>
-                                                    <Badge variant="outline" className="text-xs">
-                                                        {notification.type}
-                                                    </Badge>
                                                 </div>
-                                                <p className="text-sm text-muted-foreground">{notification.message}</p>
-                                                <p className="text-xs text-muted-foreground mt-1">{notification.createdAt}</p>
                                             </div>
-                                            {!notification.read && <div className="w-2 h-2 bg-accent rounded-full mt-2"></div>}
                                         </div>
                                     </div>
                                 ))
