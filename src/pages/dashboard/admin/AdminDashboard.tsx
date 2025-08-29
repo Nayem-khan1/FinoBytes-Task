@@ -117,16 +117,19 @@ const AdminDashboard = () => {
 
     return (
         <DashboardLayout>
-            <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Add responsive padding */}
+            <div className="space-y-4 p-2 sm:p-4 md:p-6">
+                {/* Stats Cards - Improve grid responsiveness */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6">
+                    {/* Stats cards remain same but with adjusted padding */}
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-3 sm:p-4 md:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total Users</p>
-                                    <p className="text-3xl font-bold">{stats.totalUsers}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Users</p>
+                                    <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats.totalUsers}</p>
                                 </div>
-                                <Users className="h-8 w-8 text-muted-foreground" />
+                                <Users className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                             </div>
                             <div className="flex items-center mt-4 text-sm">
                                 {stats.userGrowth > 0 ? (
@@ -143,13 +146,13 @@ const AdminDashboard = () => {
                     </Card>
 
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-3 sm:p-4 md:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Total Merchants</p>
-                                    <p className="text-3xl font-bold">{stats.totalMerchants}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Total Merchants</p>
+                                    <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats.totalMerchants}</p>
                                 </div>
-                                <Store className="h-8 w-8 text-muted-foreground" />
+                                <Store className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                             </div>
                             <div className="flex items-center mt-4 text-sm">
                                 <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
@@ -160,13 +163,13 @@ const AdminDashboard = () => {
                     </Card>
 
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-3 sm:p-4 md:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Active</p>
-                                    <p className="text-3xl font-bold">{stats.activeUsers}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Active</p>
+                                    <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats.activeUsers}</p>
                                 </div>
-                                <UserCheck className="h-8 w-8 text-muted-foreground" />
+                                <UserCheck className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                             </div>
                             <div className="flex items-center mt-4 text-sm">
                                 <TrendingUp className="h-4 w-4 text-green-500 mr-1" />
@@ -177,13 +180,13 @@ const AdminDashboard = () => {
                     </Card>
 
                     <Card>
-                        <CardContent className="p-6">
+                        <CardContent className="p-3 sm:p-4 md:p-6">
                             <div className="flex items-center justify-between">
                                 <div>
-                                    <p className="text-sm font-medium text-muted-foreground">Pending</p>
-                                    <p className="text-3xl font-bold">{stats.pendingUsers}</p>
+                                    <p className="text-xs sm:text-sm font-medium text-muted-foreground">Pending</p>
+                                    <p className="text-xl sm:text-2xl md:text-3xl font-bold">{stats.pendingUsers}</p>
                                 </div>
-                                <UserX className="h-8 w-8 text-muted-foreground" />
+                                <UserX className="h-6 w-6 sm:h-8 sm:w-8 text-muted-foreground" />
                             </div>
                             <div className="flex items-center mt-4 text-sm">
                                 <TrendingDown className="h-4 w-4 text-red-500 mr-1" />
@@ -194,58 +197,62 @@ const AdminDashboard = () => {
                     </Card>
                 </div>
 
-                <Card>
-                    <CardHeader>
-                        <CardTitle>Users & Merchants</CardTitle>
-                        <CardDescription>Manage all users and merchants in the system</CardDescription>
+                <Card className="overflow-hidden">
+                    <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-lg sm:text-xl">Users & Merchants</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">Manage all users and merchants in the system</CardDescription>
                     </CardHeader>
-                    <CardContent className="space-y-6">
-                        <div className="flex flex-col sm:flex-row gap-4">
-                            <div className="flex-1">
+                    <CardContent className="p-3 sm:p-6 space-y-4">
+                        {/* Search and Filters - Stack on mobile, row on larger screens */}
+                        <div className="flex flex-col sm:flex-row gap-3">
+                            <div className="w-full sm:flex-1">
                                 <div className="relative">
                                     <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
                                     <Input
-                                        placeholder="Search by name, email, or store..."
+                                        placeholder="Search..."
                                         value={searchTerm}
                                         onChange={(e) => setSearchTerm(e.target.value)}
-                                        className="pl-10"
+                                        className="pl-10 w-full"
                                     />
                                 </div>
                             </div>
-                            <Select value={roleFilter} onValueChange={setRoleFilter}>
-                                <SelectTrigger className="w-full sm:w-40">
-                                    <SelectValue placeholder="Filter by role" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Roles</SelectItem>
-                                    <SelectItem value="admin">Admin</SelectItem>
-                                    <SelectItem value="merchant">Merchant</SelectItem>
-                                    <SelectItem value="member">Member</SelectItem>
-                                </SelectContent>
-                            </Select>
-                            <Select value={statusFilter} onValueChange={setStatusFilter}>
-                                <SelectTrigger className="w-full sm:w-40">
-                                    <SelectValue placeholder="Filter by status" />
-                                </SelectTrigger>
-                                <SelectContent>
-                                    <SelectItem value="all">All Status</SelectItem>
-                                    <SelectItem value="active">Active</SelectItem>
-                                    <SelectItem value="suspended">Suspended</SelectItem>
-                                    <SelectItem value="pending">Pending</SelectItem>
-                                </SelectContent>
-                            </Select>
+                            <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+                                <Select value={roleFilter} onValueChange={setRoleFilter}>
+                                    <SelectTrigger className="w-full sm:w-[130px]">
+                                        <SelectValue placeholder="Role" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Roles</SelectItem>
+                                        <SelectItem value="admin">Admin</SelectItem>
+                                        <SelectItem value="merchant">Merchant</SelectItem>
+                                        <SelectItem value="member">Member</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                                    <SelectTrigger className="w-full sm:w-[130px]">
+                                        <SelectValue placeholder="Status" />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                        <SelectItem value="all">All Status</SelectItem>
+                                        <SelectItem value="active">Active</SelectItem>
+                                        <SelectItem value="suspended">Suspended</SelectItem>
+                                        <SelectItem value="pending">Pending</SelectItem>
+                                    </SelectContent>
+                                </Select>
+                            </div>
                         </div>
 
-                        <div className="rounded-md border">
+                        {/* Responsive Table */}
+                        <div className="rounded-md border overflow-x-auto">
                             <Table>
                                 <TableHeader>
                                     <TableRow>
-                                        <TableHead>Name</TableHead>
-                                        <TableHead>Role</TableHead>
-                                        <TableHead>Email/Store ID</TableHead>
-                                        <TableHead>Status</TableHead>
-                                        <TableHead>Created At</TableHead>
-                                        <TableHead className="text-right">Actions</TableHead>
+                                        <TableHead className="whitespace-nowrap">Name</TableHead>
+                                        <TableHead className="whitespace-nowrap">Role</TableHead>
+                                        <TableHead className="whitespace-nowrap">Email/Store ID</TableHead>
+                                        <TableHead className="whitespace-nowrap">Status</TableHead>
+                                        <TableHead className="whitespace-nowrap">Created At</TableHead>
+                                        <TableHead className="text-right whitespace-nowrap">Actions</TableHead>
                                     </TableRow>
                                 </TableHeader>
                                 <TableBody>
@@ -337,17 +344,17 @@ const AdminDashboard = () => {
                 </Card>
 
                 <Card>
-                    <CardHeader>
-                        <CardTitle>Quick Actions</CardTitle>
-                        <CardDescription>Perform common administrative tasks</CardDescription>
+                    <CardHeader className="p-4 sm:p-6">
+                        <CardTitle className="text-lg sm:text-xl">Quick Actions</CardTitle>
+                        <CardDescription className="text-xs sm:text-sm">Perform common administrative tasks</CardDescription>
                     </CardHeader>
-                    <CardContent>
-                        <div className="flex flex-col sm:flex-row gap-4">
+                    <CardContent className="p-3 sm:p-6">
+                        <div className="flex flex-col sm:flex-row gap-3">
                             <Dialog open={showCreateMerchant} onOpenChange={setShowCreateMerchant}>
                                 <DialogTrigger asChild>
-                                    <Button className="flex items-center gap-2">
+                                    <Button className="w-full sm:w-auto flex items-center justify-center gap-2">
                                         <Store className="h-4 w-4" />
-                                        Create Merchant
+                                        <span>Create Merchant</span>
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent>
@@ -408,9 +415,12 @@ const AdminDashboard = () => {
 
                             <Dialog open={showInviteAdmin} onOpenChange={setShowInviteAdmin}>
                                 <DialogTrigger asChild>
-                                    <Button variant="outline" className="flex items-center gap-2 bg-transparent">
+                                    <Button
+                                        variant="outline"
+                                        className="w-full sm:w-auto flex items-center justify-center gap-2 bg-transparent"
+                                    >
                                         <Mail className="h-4 w-4" />
-                                        Invite Admin
+                                        <span>Invite Admin</span>
                                     </Button>
                                 </DialogTrigger>
                                 <DialogContent>
@@ -444,15 +454,18 @@ const AdminDashboard = () => {
                     </CardContent>
                 </Card>
 
+                {/* User Details Dialog - Make it more mobile friendly */}
                 <Dialog open={!!selectedUser} onOpenChange={() => setSelectedUser(null)}>
-                    <DialogContent>
+                    <DialogContent className="sm:max-w-[425px] max-h-[90vh] overflow-y-auto">
                         <DialogHeader>
-                            <DialogTitle>User Details</DialogTitle>
-                            <DialogDescription>View detailed information about this user</DialogDescription>
+                            <DialogTitle className="text-lg sm:text-xl">User Details</DialogTitle>
+                            <DialogDescription className="text-xs sm:text-sm">
+                                View detailed information about this user
+                            </DialogDescription>
                         </DialogHeader>
                         {selectedUser && (
                             <div className="space-y-4">
-                                <div className="grid grid-cols-2 gap-4">
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                     <div>
                                         <Label className="text-sm font-medium">Name</Label>
                                         <p className="text-sm text-muted-foreground">{selectedUser.name}</p>
@@ -481,7 +494,11 @@ const AdminDashboard = () => {
                             </div>
                         )}
                         <DialogFooter>
-                            <Button variant="outline" onClick={() => setSelectedUser(null)}>
+                            <Button
+                                variant="outline"
+                                onClick={() => setSelectedUser(null)}
+                                className="w-full sm:w-auto"
+                            >
                                 Close
                             </Button>
                         </DialogFooter>
@@ -489,7 +506,7 @@ const AdminDashboard = () => {
                 </Dialog>
             </div>
         </DashboardLayout>
-    )
-}
+    );
+};
 
 export default AdminDashboard;
